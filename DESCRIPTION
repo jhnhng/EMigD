@@ -29,7 +29,8 @@ Suggests:
     knitr,
     lubridate,
     dplyr,
-    tibble
+    tibble,
+    amt
 VignetteBuilder: knitr
 Config/testthat/edition: 3
 Depends: 

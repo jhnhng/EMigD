@@ -5,5 +5,8 @@ articles:
   01 Setting Up the Data: 01 Setting Up the Data.html
   02 Different intervals between seasons: 02 Different intervals between seasons.html
   03 Using-EmigD: 03 Using-EmigD.html
-last_built: 2022-04-21T18:21Z
+last_built: 2022-04-21T20:20Z
+urls:
+  reference: https://jhnhng.github.io/EMigD/reference
+  article: https://jhnhng.github.io/EMigD/articles
 

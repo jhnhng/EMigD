@@ -1,6 +1,6 @@
-# trekR (Migration Classifier)
+# EMigD (Migration Classifier)
 
-The aim of `trekR` is to automate the classification of individuals, as a migrant or non-migrant, across a continuous scale. I would recommend first looking over the article "Setting Up the Data"" under the articles tab, before looking at how to use the functions in the `trekR` package shown under "Using the functions in `trekR`".
+The aim of `EMigD` is to automate the classification of individuals, as a migrant or non-migrant, across a continuous scale. I would recommend first looking over the article "Setting Up the Data"" under the articles tab, before looking at how to use the functions in the `EMigD` package shown under "Using the functions in `EMigD`".
 
 To accomplish this:
 
@@ -21,5 +21,5 @@ To accomplish this:
 
 
 ## Installation
-To install the current development version of `trekR` use: `devtools::install_github("jhnhng/trekR")`
+To install the current development version of `EMigD` use: `devtools::install_github("jhnhng/EMigD")`
 

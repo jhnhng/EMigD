@@ -1,0 +1,95 @@
+---
+title: "Different intervals between seasons"
+output: rmarkdown::html_vignette
+vignette: >
+  %\VignetteIndexEntry{Different intervals between seasons}
+  %\VignetteEngine{knitr::rmarkdown}
+  %\VignetteEncoding{UTF-8}
+---
+
+```{r, include = FALSE}
+knitr::opts_chunk$set(
+  collapse = TRUE,
+  comment = "#>"
+)
+
+```
+
+```{r message = FALSE}
+library(EMigD)
+library(lubridate)
+library(dplyr)
+library(tibble)
+```
+
+## Setting Up the Data
+
+### Create Intervals
+
+We created 10-day intervals for deer in the January and July. We first created a `start` column using the `floor_Date()` function to obtain the 10-day extents within the months. We included the 31st day (if a month had 31 days) in the third 10-day interval to prevent the creation of a 4th 10-day interval with only a single day in it.
+
+### Intervals for January
+
+```{r Jan Intervals}
+jan <- deer %>%
+  # Creates a start column assigning the first day in the 10-day interval in which
+  # the date falls under (e.g., 01-03-2021 would be in the first 10-day interval
+  # so the `floor_date` assigned to it would be 01-01-2021)
+  mutate(start = floor_date(date, "10 days")) %>%
+  # For any months that has 31 days, the 31st day would normally be assigned its 
+  # own interval. The code below takes the 31st day and joins it with the 
+  # previous interval. 
+  group_by(ID) %>% 
+  mutate(start = if_else(day(start) == 31, start - days(10), start)) %>% 
+  group_by(start, .add = TRUE) %>%
+  filter(month == "1") %>% 
+  group_split()
+```
+Let's remove some list elements from the `jan` interval so that we have 
+different number of intervals between `jan` and `july`. 
+```{r}
+jan <- jan[-c(17,18)]
+```
+
+### Intervals for July
+
+```{r July Intervals}
+july <- deer %>%
+  # Creates a start column assigning the first day in the 10-day interval in which
+  # the date falls under (e.g., 01-03-2021 would be in the first 10-day interval
+  # so the `floor_date` assigned to it would be 01-01-2021)
+  mutate(start = floor_date(date, "10 days")) %>%
+  # For any months that has 31 days, the 31st day would normally be assigned its 
+  # own interval. The code below takes the 31st day and joins it with the 
+  # previous interval. 
+  group_by(ID) %>% 
+  mutate(start = if_else(day(start) == 31, start - days(10), start)) %>% 
+  group_by(start, .add = TRUE) %>%
+  filter(month == "7") %>% 
+  group_split()
+
+```
+
+### Assign names to the list elements
+The names that are assigned to each list element is specific to that interval.
+In this case, we use the `ID` and `start` columns in the list element to assign 
+a name. These names are important because they are later used to determine which 
+elements are missing between the two list objects.
+
+```{r Names for intervals}
+names(jan) <- sapply(jan, function(x) paste(x$ID[1],
+                                            x$start[1], sep = '_'))
+
+names(july) <- sapply(july, function(x) paste(x$ID[1],
+                                              x$start[1],sep = '_'))
+                                              
+```
+
+### Matching Intervals
+Using the `match_intervals` function we can match the number of intervals in 
+`july` to those in `jan`. In this case, the first argument `list1` is the 
+reference list for the second argument `list2`. 
+```{r Matching Intervals}
+july <- match_intervals(list1 = jan, list2 = july)
+
+```

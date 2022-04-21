@@ -1,0 +1,78 @@
+---
+title: "Using the functions in `EMigD`"
+output: rmarkdown::html_vignette
+vignette: >
+  %\VignetteIndexEntry{Using the functions in `EMigD`}
+  %\VignetteEngine{knitr::rmarkdown}
+  %\VignetteEncoding{UTF-8}
+---
+
+```{r, include = FALSE}
+knitr::opts_chunk$set(
+  collapse = TRUE,
+  comment = "#>"
+)
+
+```
+
+    library(EMigD)
+    library(lubridate)
+    library(dplyr)
+
+## Earth Mover's Distance
+
+The earth mover's distance (EMD), also known as the Wasserstein metric, is a measure of the distance between two probability distributions over a region. For example, if the distributions are two different ways of piling up a certain amount of dirt over a region, the EMD is the minimum effort needed in turning one pile into the other, where the cost is assumed to be the amount of dirt moved times the distance it is moved.
+
+## EMDs
+
+Calculates the EMD's between the summer and winter UDs. In our example, `seasons[[1]]` and `seasons[[2]]` are used to calculate the EMDs in geographical space, while `sum_rst` and `win_rst` are used to calculate the EMDs in environmental space.
+
+    # Geographical Space
+    btwemd_geo <- between_emd(sum_raster, win_raster)
+
+    # Environmental Space
+    btwemd_env <- between_emd(sum_rst, win_rst)
+
+Calculates the EMDs between the intervals within a single season.
+
+    # Geographical Space
+    withsum_geo <- within_emd(sum_raster)
+    withwin_geo <- within_emd(win_raster)
+
+    # Environmental Space
+    withsum_env <- within_emd(sum_rst)
+    withwin_env <- within_emd(win_rst)
+
+## EM-Speeds
+
+Calculate 'EM-speeds' by dividing each EMD by the time elapsed between the two UDs it corresponds to. For example, to calculate the EM-speeds between the first intervals in `jan` and `july`, the EMDs for the intervals are divided by the the difference in Julian dates between the starts dates of each interval.
+
+\$EMD /(Julian.start.2 - Julian.start.1) \$
+
+We calculated the EM-speeds between seasons (e.g., first intervals between `jan` and `july`), and within seasons (e.g., first and second intervals between `jan` and `july`) using the `emspeeds()` in our `EMigD` package. The example below demonstrates the calculation for the EM-speeds for geographical space, but can easily be replaced with `btwemd_env`, `withsum_env` and `withwin_env`.
+
+    btwesp <- emspeeds(july, jan, btwemd_geo)
+
+    wesp_sum <- emspeeds(july, july, withsum_geo)
+    wesp_win <- emspeeds(jan, jan, withwin_geo)
+
+## Average Within and Between Season EM-Speeds
+
+We calculated the average between-season and within-season EM-speeds, where each unique value is counted only once and any zeros are excluded. If an animal does not shift its space use between season, the within-season EM-speeds should be similar to the between-seasons EM-speeds.
+
+    btwavg_geo <- lapply(btwesp, function(x) mean(unique(x[x!= 0])))
+
+    wesp_both <- Map(c, wesp_sum, wesp_win)
+    wesavg_geo <- lapply(wesp_all, function(x) mean(unique(x[x!= 0])))
+
+The ratio between the two averages are the migratory predictors and are limitless. Values that are closer to 0 may indicate that an individual did not migrate during a given year, while values further from 0 may indicate that an individual has migrated.
+
+    predictor <- Map("/", btwavg_geo, wavg_geo)
+
+The results can then be extracted and placed into a data frame which can then be written into a .csv file or your preferred file type.
+
+    out <- transform(read.table(text = unlist(unique(names(win_raster))), header = FALSE, 
+                                col.names = c("ID", "Year"), sep = "_"),
+                     geo = unlist(predictor))
+
+    write.csv(x=out, file="Data/Results.csv")

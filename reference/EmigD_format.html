@@ -53,7 +53,7 @@
 
     <div class="section level2">
     <h2 id="ref-usage">Usage<a class="anchor" aria-label="anchor" href="#ref-usage"></a></h2>
-    <div class="sourceCode"><pre class="sourceCode r"><code><span class="fu">EmigD_format</span><span class="op">(</span><span class="va">dat</span>, <span class="va">id_</span>, <span class="va">x_</span>, <span class="va">y_</span>, <span class="va">year_</span>, <span class="va">month_</span>, <span class="va">jdate_</span><span class="op">)</span></code></pre></div>
+    <div class="sourceCode"><pre class="sourceCode r"><code><span class="fu">EmigD_format</span><span class="op">(</span><span class="va">dat</span>, <span class="va">id_</span>, <span class="va">dt_</span>, <span class="va">x_</span>, <span class="va">y_</span>, <span class="va">year_</span>, <span class="va">month_</span>, <span class="va">jdate_</span><span class="op">)</span></code></pre></div>
     </div>
 
     <div class="section level2">
@@ -61,7 +61,11 @@
     <dl><dt>dat</dt>
 <dd><p>A data frame</p></dd>
 <dt>id_</dt>
-<dd><p>The individual ID column in 'dat'. This column should be a 'factor'.</p></dd>
+<dd><p>The individual ID column in 'dat'. This column should be a
+'Factor'.</p></dd>
+<dt>dt_</dt>
+<dd><p>The date and time column in 'dat'. Thhis column should be
+'POSIXct' class.</p></dd>
 <dt>x_</dt>
 <dd><p>The x-coordinate column in 'dat'.</p></dd>
 <dt>y_</dt>
@@ -78,7 +82,7 @@ a numeric value</p></dd>
 </dl></div>
     <div class="section level2">
     <h2 id="value">Value<a class="anchor" aria-label="anchor" href="#value"></a></h2>
-    <p>Function re-formats the user's data frame for the EmigD workflow</p>
+    <p>A data frame with the columns specified, and renames the column names</p>
     </div>
 
   </main><aside class="col-md-3"><nav id="toc"><h2>On this page</h2>

@@ -19,8 +19,8 @@ emspeeds <- function(t1, t2, emd) {
   f1 <- function(.int1, .int2) {
     t(outer(seq_along(.int1), seq_along(.int2),
       FUN = Vectorize(function(i, j) {
-        min(.int1[[i]]$jDate) -
-          min(.int2[[j]]$jDate)
+        min(.int1[[i]]$jdate_) -
+          min(.int2[[j]]$jdate_)
       })
     ))
   }

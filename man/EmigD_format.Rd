@@ -4,12 +4,16 @@
 \alias{EmigD_format}
 \title{Re-formats the User's data frame for the EMigD workflow}
 \usage{
-EmigD_format(dat, id_, x_, y_, year_, month_, jdate_)
+EmigD_format(dat, id_, dt_, x_, y_, year_, month_, jdate_)
 }
 \arguments{
 \item{dat}{A data frame}
 
-\item{id_}{The individual ID column in 'dat'. This column should be a 'factor'.}
+\item{id_}{The individual ID column in 'dat'. This column should be a
+'Factor'.}
+
+\item{dt_}{The date and time column in 'dat'. Thhis column should be
+'POSIXct' class.}
 
 \item{x_}{The x-coordinate column in 'dat'.}
 

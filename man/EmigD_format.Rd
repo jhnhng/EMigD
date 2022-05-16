@@ -25,7 +25,7 @@ be a numeric value.}
 a numeric value}
 }
 \value{
-Function re-formats the user's data frame for the EmigD workflow
+A data frame with the columns specified, and renames the column names
 }
 \description{
 Re-formats the User's data frame for the EMigD workflow

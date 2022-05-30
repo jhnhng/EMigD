@@ -24,6 +24,15 @@ library(tibble)
 
 ## Setting Up the Data
 
+### Formatting the Data
+Before moving into the data, we could first format the data so that we can go through the workflow smoothly using `EmigD_format`. This allows us to have a consistent column names as we move through the workflow. The arguments in `EmigD_format` consist of the necessary columns needed.  
+
+```{r}
+deer <- EmigD_format(deer, id_ = "ID", dt_ = "date", x_ = "utm_x", y = "utm_y",
+                   year_ = "year", month_ = "month", jdate_ = "julian")
+```
+
+
 ### Create Intervals
 
 We created 10-day intervals for deer in the January and July. We first created a `start` column using the `floor_Date()` function to obtain the 10-day extents within the months. We included the 31st day (if a month had 31 days) in the third 10-day interval to prevent the creation of a 4th 10-day interval with only a single day in it.
@@ -35,13 +44,13 @@ jan <- deer %>%
   # Creates a start column assigning the first day in the 10-day interval in which
   # the date falls under (e.g., 01-03-2021 would be in the first 10-day interval
   # so the `floor_date` assigned to it would be 01-01-2021)
-  mutate(start = floor_date(date, "10 days")) %>%
+  mutate(start = floor_date(dt_, "10 days")) %>%
   # For any months that has 31 days, the 31st day would normally be assigned its 
   # own interval. The code below takes the 31st day and joins it with the 
   # previous interval. 
   mutate(start = if_else(day(start) == 31, start - days(10), start)) %>% 
   group_by(id_, start) %>%
-  filter(month == "1") %>% 
+  filter(month_ == "1") %>% 
   group_split()
 ```
 
@@ -59,13 +68,13 @@ july <- deer %>%
   # Creates a start column assigning the first day in the 10-day interval in which
   # the date falls under (e.g., 01-03-2021 would be in the first 10-day interval
   # so the `floor_date` assigned to it would be 01-01-2021)
-  mutate(start = floor_date(date, "10 days")) %>%
+  mutate(start = floor_date(dt_, "10 days")) %>%
   # For any months that has 31 days, the 31st day would normally be assigned its 
   # own interval. The code below takes the 31st day and joins it with the 
   # previous interval. 
   mutate(start = if_else(day(start) == 31, start - days(10), start)) %>% 
   group_by(id_, start) %>%
-  filter(month == "7") %>% 
+  filter(month_ == "7") %>% 
   group_split()
 
 ```

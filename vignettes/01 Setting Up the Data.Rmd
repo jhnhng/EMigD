@@ -34,8 +34,8 @@ The selected periods to be divided into intervals should be chosen so that they 
 Before moving into the data, we could first format the data so that we can go through the workflow smoothly using `EmigD_format`. This allows us to have a consistent column names as we move through the workflow. The arguments in `EmigD_format` consist of the necessary columns needed.  
 
 ```{r}
-deer <- EmigD_format(df, id_ = "AnimalID", dt_ = "dt", x_ = "utm_x", y = "utm_y",
-                   year_ = "year", month_ = "month", jdate_ = "jDate")
+deer <- EmigD_format(deer, id_ = "ID", dt_ = "date", x_ = "utm_x", y = "utm_y",
+                   year_ = "year", month_ = "month", jdate_ = "julian")
 ```
 
 
@@ -50,7 +50,7 @@ jan <- deer %>%
   # Creates a start column assigning the first day in the 10-day interval in which
   # the date falls under (e.g., 01-03-2021 would be in the first 10-day interval
   # so the `floor_date` assigned to it would be 01-01-2021)
-  mutate(start = floor_date(date, "10 days")) %>%
+  mutate(start = floor_date(dt_, "10 days")) %>%
   # For any months that has 31 days, the 31st day would normally be assigned its 
   # own interval. The code below takes the 31st day and joins it with the 
   # previous interval. 
@@ -67,7 +67,7 @@ july <- deer %>%
   # Creates a start column assigning the first day in the 10-day interval in which
   # the date falls under (e.g., 01-03-2021 would be in the first 10-day interval
   # so the `floor_date` assigned to it would be 01-01-2021)
-  mutate(start = floor_date(date, "10 days")) %>%
+  mutate(start = floor_date(dt_, "10 days")) %>%
   # For any months that has 31 days, the 31st day would normally be assigned its 
   # own interval. The code below takes the 31st day and joins it with the 
   # previous interval. 
@@ -101,15 +101,15 @@ Before we estimate LoCoH home range for each of these 10-day intervals, we first
 
 ```{r tracks, message = FALSE}
 track_list_sum <- lapply(july, function(x) {
-  amt::make_track(tbl = x, .x = x_, .y = y_, .t = date,
-             uid = ID,
+  amt::make_track(tbl = x, .x = x_, .y = y_, .t = dt_,
+             uid = id_,
              # lat/long: 4326 (lat/long, WGS84 datum).
              # utm: crs = sp::CRS("+init=epsg:32612"))
              crs = 32612)
 })
 track_list_win <- lapply(jan, function(x) {
-  amt::make_track(tbl = x, .x = x_, .y = y_, .t = date,
-             uid = ID,
+  amt::make_track(tbl = x, .x = x_, .y = y_, .t = dt_,
+             uid = id_,
              crs = 32612)
 })
 
@@ -223,10 +223,10 @@ win_raster <- lapply(win_iso, function(iso){
     x <- raster_locoh / raster::cellStats(raster_locoh, sum)
 })
 
-names(win_raster) <- sapply(jan, function(x) paste(x$ID[1],
+names(win_raster) <- sapply(jan, function(x) paste(x$id_[1],
                                             x$year_[1], sep = '_'))
 
-names(sum_raster) <- sapply(july, function(x) paste(x$ID[1],
+names(sum_raster) <- sapply(july, function(x) paste(x$id_[1],
                                               x$year_[1], sep = '_'))
 
 ```
@@ -237,7 +237,7 @@ We attach attributes to our list of rasters to allow for more flexibility in wor
 
 ```{r, results = "hide"}
 # Add an attribute to hold the attributes of each list element
-attributes(win_raster) <- data.frame(id = sapply(jan, function(x) paste(x$ID[1])),
+attributes(win_raster) <- data.frame(id = sapply(jan, function(x) paste(x$id_[1])),
                                       interval_start_date = sapply(jan, function(x) paste(x$start[1])),
                                       year = paste0(sapply(jan, function(x) paste(x$year_[1])))
 )
@@ -246,7 +246,7 @@ attributes(win_raster) <- data.frame(id = sapply(jan, function(x) paste(x$ID[1])
 attributes(win_raster)
 
 # Add an attribute "tab" to hold the attributes of each list element
-attributes(sum_raster) <- data.frame(id = sapply(july, function(x) paste(x$ID[1])),
+attributes(sum_raster) <- data.frame(id = sapply(july, function(x) paste(x$id_[1])),
                                       interval_start_date = sapply(july, function(x) paste(x$start[1])),
                                       year = paste0(sapply(july, function(x) paste(x$year_[1])))
 )

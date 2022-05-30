@@ -5,6 +5,8 @@
 \alias{EMigD}
 \title{EMigD: A package for classifying migrants}
 \description{
-The aim of EMigD is to classify an individual as a migrant or not within a
-given year.
+This package provides a means to quantify an individual's
+migratory status within a given year. This packages allows the user
+to determine an individual's migratory status within geographical
+and environmental space.
 }

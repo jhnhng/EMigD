@@ -10,6 +10,7 @@
 #'    Defaults to 50.
 #'
 #' @return EMD between rs1 and rs2 in one dimension of environmental space.
+#'
 #' @importFrom raster values
 #' @importFrom stats aggregate
 #' @importFrom transport wasserstein1d

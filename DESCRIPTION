@@ -1,6 +1,6 @@
 Package: EMigD
 Title: Migration Classifier
-Version: 0.0.2.500
+Version: 0.0.3.500
 Authors@R: 
     person(given = "John",
            family = "Huang",

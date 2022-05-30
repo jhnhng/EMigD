@@ -4,16 +4,25 @@
 \alias{match_intervals}
 \title{Matches the number of intervals between the two seasons selected}
 \usage{
-match_intervals(list1, list2)
+match_intervals(attribute_name, list1, list2, id_col, interval_col)
 }
 \arguments{
+\item{attribute_name}{The name of the attribute item created for both
+\code{list1} and \code{list2} The input for this argument must be a character.}
+
 \item{list1}{A list object that is the reference for \code{list2}}
 
-\item{list2}{A list object that the length of \code{list1} is being matched to}
+\item{list2}{A list object that the length of \code{list2} is being matched to}
+
+\item{id_col}{This should be the name of assigned to the id column within the
+attribute table created.}
+
+\item{interval_col}{This should be the name assigned to the interval column
+within the attribute_table created.}
 }
 \value{
-The output is a list that has the same intervals as that in the
-\code{list2} object.
+The output is a list that contains two new list. These two new list
+have the same individuals and intervals for those individuals.
 }
 \description{
 Matches the number of intervals between the two seasons selected

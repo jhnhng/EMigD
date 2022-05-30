@@ -2,6 +2,7 @@
 
 export(EmigD_format)
 export(between_emd)
+export(check)
 export(emd_env)
 export(emd_geo)
 export(emspeeds)

@@ -10,7 +10,7 @@
     
     <a class="navbar-brand me-2" href="../index.html">EMigD</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.0.2.500</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.0.3.500</small>
 
     
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -53,20 +53,29 @@
 
     <div class="section level2">
     <h2 id="ref-usage">Usage<a class="anchor" aria-label="anchor" href="#ref-usage"></a></h2>
-    <div class="sourceCode"><pre class="sourceCode r"><code><span class="fu">match_intervals</span><span class="op">(</span><span class="va">list1</span>, <span class="va">list2</span><span class="op">)</span></code></pre></div>
+    <div class="sourceCode"><pre class="sourceCode r"><code><span class="fu">match_intervals</span><span class="op">(</span><span class="va">attribute_name</span>, <span class="va">list1</span>, <span class="va">list2</span>, <span class="va">id_col</span>, <span class="va">interval_col</span><span class="op">)</span></code></pre></div>
     </div>
 
     <div class="section level2">
     <h2 id="arguments">Arguments<a class="anchor" aria-label="anchor" href="#arguments"></a></h2>
-    <dl><dt>list1</dt>
+    <dl><dt>attribute_name</dt>
+<dd><p>The name of the attribute item created for both
+<code>list1</code> and <code>list2</code> The input for this argument must be a character.</p></dd>
+<dt>list1</dt>
 <dd><p>A list object that is the reference for <code>list2</code></p></dd>
 <dt>list2</dt>
-<dd><p>A list object that the length of <code>list1</code> is being matched to</p></dd>
+<dd><p>A list object that the length of <code>list2</code> is being matched to</p></dd>
+<dt>id_col</dt>
+<dd><p>This should be the name of assigned to the id column within the
+attribute table created.</p></dd>
+<dt>interval_col</dt>
+<dd><p>This should be the name assigned to the interval column
+within the attribute_table created.</p></dd>
 </dl></div>
     <div class="section level2">
     <h2 id="value">Value<a class="anchor" aria-label="anchor" href="#value"></a></h2>
-    <p>The output is a list that has the same intervals as that in the
-<code>list2</code> object.</p>
+    <p>The output is a list that contains two new list. These two new list
+have the same individuals and intervals for those individuals.</p>
     </div>
 
   </main><aside class="col-md-3"><nav id="toc"><h2>On this page</h2>

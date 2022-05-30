@@ -26,7 +26,7 @@
     
     <a class="navbar-brand me-2" href="../index.html">EMigD</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.0.2.500</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.0.3.500</small>
 
     
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -83,6 +83,14 @@
 <h2 id="setting-up-the-data">Setting Up the Data<a class="anchor" aria-label="anchor" href="#setting-up-the-data"></a>
 </h2>
 <div class="section level3">
+<h3 id="formatting-the-data">Formatting the Data<a class="anchor" aria-label="anchor" href="#formatting-the-data"></a>
+</h3>
+<p>Before moving into the data, we could first format the data so that we can go through the workflow smoothly using <code>EmigD_format</code>. This allows us to have a consistent column names as we move through the workflow. The arguments in <code>EmigD_format</code> consist of the necessary columns needed.</p>
+<div class="sourceCode" id="cb2"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span class="va">deer</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/EmigD_format.html">EmigD_format</a></span><span class="op">(</span><span class="va">deer</span>, id_ <span class="op">=</span> <span class="st">"ID"</span>, dt_ <span class="op">=</span> <span class="st">"date"</span>, x_ <span class="op">=</span> <span class="st">"utm_x"</span>, y <span class="op">=</span> <span class="st">"utm_y"</span>,
+                   year_ <span class="op">=</span> <span class="st">"year"</span>, month_ <span class="op">=</span> <span class="st">"month"</span>, jdate_ <span class="op">=</span> <span class="st">"julian"</span><span class="op">)</span></code></pre></div>
+</div>
+<div class="section level3">
 <h3 id="create-intervals">Create Intervals<a class="anchor" aria-label="anchor" href="#create-intervals"></a>
 </h3>
 <p>We created 10-day intervals for deer in the January and July. We first created a <code>start</code> column using the <code>floor_Date()</code> function to obtain the 10-day extents within the months. We included the 31st day (if a month had 31 days) in the third 10-day interval to prevent the creation of a 4th 10-day interval with only a single day in it.</p>
@@ -90,60 +98,105 @@
 <div class="section level3">
 <h3 id="intervals-for-january">Intervals for January<a class="anchor" aria-label="anchor" href="#intervals-for-january"></a>
 </h3>
-<div class="sourceCode" id="cb2"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb3"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="va">jan</span> <span class="op">&lt;-</span> <span class="va">deer</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span>
   <span class="co"># Creates a start column assigning the first day in the 10-day interval in which</span>
   <span class="co"># the date falls under (e.g., 01-03-2021 would be in the first 10-day interval</span>
   <span class="co"># so the `floor_date` assigned to it would be 01-01-2021)</span>
-  <span class="fu"><a href="https://dplyr.tidyverse.org/reference/mutate.html" class="external-link">mutate</a></span><span class="op">(</span>start <span class="op">=</span> <span class="fu"><a href="https://lubridate.tidyverse.org/reference/round_date.html" class="external-link">floor_date</a></span><span class="op">(</span><span class="va">date</span>, <span class="st">"10 days"</span><span class="op">)</span><span class="op">)</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span>
+  <span class="fu"><a href="https://dplyr.tidyverse.org/reference/mutate.html" class="external-link">mutate</a></span><span class="op">(</span>start <span class="op">=</span> <span class="fu"><a href="https://lubridate.tidyverse.org/reference/round_date.html" class="external-link">floor_date</a></span><span class="op">(</span><span class="va">dt_</span>, <span class="st">"10 days"</span><span class="op">)</span><span class="op">)</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span>
   <span class="co"># For any months that has 31 days, the 31st day would normally be assigned its </span>
   <span class="co"># own interval. The code below takes the 31st day and joins it with the </span>
   <span class="co"># previous interval. </span>
-  <span class="fu"><a href="https://dplyr.tidyverse.org/reference/group_by.html" class="external-link">group_by</a></span><span class="op">(</span><span class="va">ID</span><span class="op">)</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span> 
   <span class="fu"><a href="https://dplyr.tidyverse.org/reference/mutate.html" class="external-link">mutate</a></span><span class="op">(</span>start <span class="op">=</span> <span class="fu"><a href="https://dplyr.tidyverse.org/reference/if_else.html" class="external-link">if_else</a></span><span class="op">(</span><span class="fu"><a href="https://lubridate.tidyverse.org/reference/day.html" class="external-link">day</a></span><span class="op">(</span><span class="va">start</span><span class="op">)</span> <span class="op">==</span> <span class="fl">31</span>, <span class="va">start</span> <span class="op">-</span> <span class="fu"><a href="https://lubridate.tidyverse.org/reference/period.html" class="external-link">days</a></span><span class="op">(</span><span class="fl">10</span><span class="op">)</span>, <span class="va">start</span><span class="op">)</span><span class="op">)</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span> 
-  <span class="fu"><a href="https://dplyr.tidyverse.org/reference/group_by.html" class="external-link">group_by</a></span><span class="op">(</span><span class="va">start</span>, .add <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span>
-  <span class="fu"><a href="https://dplyr.tidyverse.org/reference/filter.html" class="external-link">filter</a></span><span class="op">(</span><span class="va">month</span> <span class="op">==</span> <span class="st">"1"</span><span class="op">)</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span> 
+  <span class="fu"><a href="https://dplyr.tidyverse.org/reference/group_by.html" class="external-link">group_by</a></span><span class="op">(</span><span class="va">id_</span>, <span class="va">start</span><span class="op">)</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span>
+  <span class="fu"><a href="https://dplyr.tidyverse.org/reference/filter.html" class="external-link">filter</a></span><span class="op">(</span><span class="va">month_</span> <span class="op">==</span> <span class="st">"1"</span><span class="op">)</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span> 
   <span class="fu"><a href="https://dplyr.tidyverse.org/reference/group_split.html" class="external-link">group_split</a></span><span class="op">(</span><span class="op">)</span></code></pre></div>
 <p>Let’s remove some list elements from the <code>jan</code> interval so that we have different number of intervals between <code>jan</code> and <code>july</code>.</p>
-<div class="sourceCode" id="cb3"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb4"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="va">jan</span> <span class="op">&lt;-</span> <span class="va">jan</span><span class="op">[</span><span class="op">-</span><span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">17</span>,<span class="fl">18</span><span class="op">)</span><span class="op">]</span></code></pre></div>
 </div>
 <div class="section level3">
 <h3 id="intervals-for-july">Intervals for July<a class="anchor" aria-label="anchor" href="#intervals-for-july"></a>
 </h3>
-<div class="sourceCode" id="cb4"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb5"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="va">july</span> <span class="op">&lt;-</span> <span class="va">deer</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span>
   <span class="co"># Creates a start column assigning the first day in the 10-day interval in which</span>
   <span class="co"># the date falls under (e.g., 01-03-2021 would be in the first 10-day interval</span>
   <span class="co"># so the `floor_date` assigned to it would be 01-01-2021)</span>
-  <span class="fu"><a href="https://dplyr.tidyverse.org/reference/mutate.html" class="external-link">mutate</a></span><span class="op">(</span>start <span class="op">=</span> <span class="fu"><a href="https://lubridate.tidyverse.org/reference/round_date.html" class="external-link">floor_date</a></span><span class="op">(</span><span class="va">date</span>, <span class="st">"10 days"</span><span class="op">)</span><span class="op">)</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span>
+  <span class="fu"><a href="https://dplyr.tidyverse.org/reference/mutate.html" class="external-link">mutate</a></span><span class="op">(</span>start <span class="op">=</span> <span class="fu"><a href="https://lubridate.tidyverse.org/reference/round_date.html" class="external-link">floor_date</a></span><span class="op">(</span><span class="va">dt_</span>, <span class="st">"10 days"</span><span class="op">)</span><span class="op">)</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span>
   <span class="co"># For any months that has 31 days, the 31st day would normally be assigned its </span>
   <span class="co"># own interval. The code below takes the 31st day and joins it with the </span>
   <span class="co"># previous interval. </span>
-  <span class="fu"><a href="https://dplyr.tidyverse.org/reference/group_by.html" class="external-link">group_by</a></span><span class="op">(</span><span class="va">ID</span><span class="op">)</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span> 
   <span class="fu"><a href="https://dplyr.tidyverse.org/reference/mutate.html" class="external-link">mutate</a></span><span class="op">(</span>start <span class="op">=</span> <span class="fu"><a href="https://dplyr.tidyverse.org/reference/if_else.html" class="external-link">if_else</a></span><span class="op">(</span><span class="fu"><a href="https://lubridate.tidyverse.org/reference/day.html" class="external-link">day</a></span><span class="op">(</span><span class="va">start</span><span class="op">)</span> <span class="op">==</span> <span class="fl">31</span>, <span class="va">start</span> <span class="op">-</span> <span class="fu"><a href="https://lubridate.tidyverse.org/reference/period.html" class="external-link">days</a></span><span class="op">(</span><span class="fl">10</span><span class="op">)</span>, <span class="va">start</span><span class="op">)</span><span class="op">)</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span> 
-  <span class="fu"><a href="https://dplyr.tidyverse.org/reference/group_by.html" class="external-link">group_by</a></span><span class="op">(</span><span class="va">start</span>, .add <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span>
-  <span class="fu"><a href="https://dplyr.tidyverse.org/reference/filter.html" class="external-link">filter</a></span><span class="op">(</span><span class="va">month</span> <span class="op">==</span> <span class="st">"7"</span><span class="op">)</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span> 
+  <span class="fu"><a href="https://dplyr.tidyverse.org/reference/group_by.html" class="external-link">group_by</a></span><span class="op">(</span><span class="va">id_</span>, <span class="va">start</span><span class="op">)</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span>
+  <span class="fu"><a href="https://dplyr.tidyverse.org/reference/filter.html" class="external-link">filter</a></span><span class="op">(</span><span class="va">month_</span> <span class="op">==</span> <span class="st">"7"</span><span class="op">)</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span> 
   <span class="fu"><a href="https://dplyr.tidyverse.org/reference/group_split.html" class="external-link">group_split</a></span><span class="op">(</span><span class="op">)</span></code></pre></div>
-</div>
-<div class="section level3">
-<h3 id="assign-names-to-the-list-elements">Assign names to the list elements<a class="anchor" aria-label="anchor" href="#assign-names-to-the-list-elements"></a>
-</h3>
-<p>The names that are assigned to each list element is specific to that interval. In this case, we use the <code>ID</code> and <code>start</code> columns in the list element to assign a name. These names are important because they are later used to determine which elements are missing between the two list objects.</p>
-<div class="sourceCode" id="cb5"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span class="fu"><a href="https://rdrr.io/r/base/names.html" class="external-link">names</a></span><span class="op">(</span><span class="va">jan</span><span class="op">)</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/lapply.html" class="external-link">sapply</a></span><span class="op">(</span><span class="va">jan</span>, <span class="kw">function</span><span class="op">(</span><span class="va">x</span><span class="op">)</span> <span class="fu"><a href="https://rdrr.io/r/base/paste.html" class="external-link">paste</a></span><span class="op">(</span><span class="va">x</span><span class="op">$</span><span class="va">ID</span><span class="op">[</span><span class="fl">1</span><span class="op">]</span>,
-                                            <span class="va">x</span><span class="op">$</span><span class="va">start</span><span class="op">[</span><span class="fl">1</span><span class="op">]</span>, sep <span class="op">=</span> <span class="st">'_'</span><span class="op">)</span><span class="op">)</span>
-
-<span class="fu"><a href="https://rdrr.io/r/base/names.html" class="external-link">names</a></span><span class="op">(</span><span class="va">july</span><span class="op">)</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/lapply.html" class="external-link">sapply</a></span><span class="op">(</span><span class="va">july</span>, <span class="kw">function</span><span class="op">(</span><span class="va">x</span><span class="op">)</span> <span class="fu"><a href="https://rdrr.io/r/base/paste.html" class="external-link">paste</a></span><span class="op">(</span><span class="va">x</span><span class="op">$</span><span class="va">ID</span><span class="op">[</span><span class="fl">1</span><span class="op">]</span>,
-                                              <span class="va">x</span><span class="op">$</span><span class="va">start</span><span class="op">[</span><span class="fl">1</span><span class="op">]</span>,sep <span class="op">=</span> <span class="st">'_'</span><span class="op">)</span><span class="op">)</span>
-                                              </code></pre></div>
 </div>
 <div class="section level3">
 <h3 id="matching-intervals">Matching Intervals<a class="anchor" aria-label="anchor" href="#matching-intervals"></a>
 </h3>
-<p>Using the <code>match_intervals</code> function we can match the number of intervals in <code>july</code> to those in <code>jan</code>. In this case, the first argument <code>list1</code> is the reference list for the second argument <code>list2</code>.</p>
+<p>Before we can begin matching the intervals, we first assign attributes to the two list (<code>jan</code> and <code>july</code>). We name this attribute <code>match</code>, and within this attribute table, we have two columns (<code>id</code> and <code>interval_</code>). We can use <code>check</code> to conveniently look our attribute table.</p>
 <div class="sourceCode" id="cb6"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span class="va">july</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/match_intervals.html">match_intervals</a></span><span class="op">(</span>list1 <span class="op">=</span> <span class="va">jan</span>, list2 <span class="op">=</span> <span class="va">july</span><span class="op">)</span></code></pre></div>
+<code class="sourceCode R"><span class="co"># Add an attribute to hold the attributes of each list element</span>
+<span class="fu"><a href="https://rdrr.io/r/base/attr.html" class="external-link">attr</a></span><span class="op">(</span><span class="va">jan</span>, <span class="st">"match"</span><span class="op">)</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/data.frame.html" class="external-link">data.frame</a></span><span class="op">(</span>id <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/lapply.html" class="external-link">sapply</a></span><span class="op">(</span><span class="va">jan</span>, <span class="kw">function</span><span class="op">(</span><span class="va">x</span><span class="op">)</span> <span class="fu"><a href="https://rdrr.io/r/base/paste.html" class="external-link">paste</a></span><span class="op">(</span><span class="va">x</span><span class="op">$</span><span class="va">id_</span><span class="op">[</span><span class="fl">1</span><span class="op">]</span><span class="op">)</span><span class="op">)</span>,
+                                  interval_ <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/lapply.html" class="external-link">sapply</a></span><span class="op">(</span><span class="va">jan</span>, <span class="kw">function</span><span class="op">(</span><span class="va">x</span><span class="op">)</span> <span class="fu"><a href="https://rdrr.io/r/base/paste.html" class="external-link">paste</a></span><span class="op">(</span><span class="va">x</span><span class="op">$</span><span class="va">start</span><span class="op">[</span><span class="fl">1</span><span class="op">]</span><span class="op">)</span><span class="op">)</span>
+<span class="op">)</span>
+
+<span class="co"># Check the attributes</span>
+<span class="fu"><a href="../reference/check.html">check</a></span><span class="op">(</span><span class="va">jan</span>, <span class="st">"match"</span><span class="op">)</span>
+<span class="co">#&gt;    id  interval_</span>
+<span class="co">#&gt; 1   A 2013-01-01</span>
+<span class="co">#&gt; 2   A 2013-01-11</span>
+<span class="co">#&gt; 3   A 2013-01-21</span>
+<span class="co">#&gt; 4   A 2014-01-01</span>
+<span class="co">#&gt; 5   A 2014-01-11</span>
+<span class="co">#&gt; 6   A 2014-01-21</span>
+<span class="co">#&gt; 7   B 2013-01-01</span>
+<span class="co">#&gt; 8   B 2013-01-11</span>
+<span class="co">#&gt; 9   B 2013-01-21</span>
+<span class="co">#&gt; 10  B 2014-01-01</span>
+<span class="co">#&gt; 11  B 2014-01-11</span>
+<span class="co">#&gt; 12  B 2014-01-21</span>
+<span class="co">#&gt; 13  C 2013-01-01</span>
+<span class="co">#&gt; 14  C 2013-01-11</span>
+<span class="co">#&gt; 15  C 2013-01-21</span>
+<span class="co">#&gt; 16  C 2014-01-01</span>
+
+<span class="co"># Add an attribute "tab" to hold the attributes of each list element</span>
+<span class="fu"><a href="https://rdrr.io/r/base/attr.html" class="external-link">attr</a></span><span class="op">(</span><span class="va">july</span>, <span class="st">"match"</span><span class="op">)</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/data.frame.html" class="external-link">data.frame</a></span><span class="op">(</span>id <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/lapply.html" class="external-link">sapply</a></span><span class="op">(</span><span class="va">july</span>, <span class="kw">function</span><span class="op">(</span><span class="va">x</span><span class="op">)</span> <span class="fu"><a href="https://rdrr.io/r/base/paste.html" class="external-link">paste</a></span><span class="op">(</span><span class="va">x</span><span class="op">$</span><span class="va">id_</span><span class="op">[</span><span class="fl">1</span><span class="op">]</span><span class="op">)</span><span class="op">)</span>,
+                                  interval_ <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/lapply.html" class="external-link">sapply</a></span><span class="op">(</span><span class="va">july</span>, <span class="kw">function</span><span class="op">(</span><span class="va">x</span><span class="op">)</span> <span class="fu"><a href="https://rdrr.io/r/base/paste.html" class="external-link">paste</a></span><span class="op">(</span><span class="va">x</span><span class="op">$</span><span class="va">start</span><span class="op">[</span><span class="fl">1</span><span class="op">]</span><span class="op">)</span><span class="op">)</span>
+<span class="op">)</span> 
+
+<span class="co"># Check the attributes</span>
+<span class="fu"><a href="../reference/check.html">check</a></span><span class="op">(</span><span class="va">july</span>, <span class="st">"match"</span><span class="op">)</span>
+<span class="co">#&gt;    id  interval_</span>
+<span class="co">#&gt; 1   A 2013-07-01</span>
+<span class="co">#&gt; 2   A 2013-07-11</span>
+<span class="co">#&gt; 3   A 2013-07-21</span>
+<span class="co">#&gt; 4   A 2014-07-01</span>
+<span class="co">#&gt; 5   A 2014-07-11</span>
+<span class="co">#&gt; 6   A 2014-07-21</span>
+<span class="co">#&gt; 7   B 2013-07-01</span>
+<span class="co">#&gt; 8   B 2013-07-11</span>
+<span class="co">#&gt; 9   B 2013-07-21</span>
+<span class="co">#&gt; 10  B 2014-07-01</span>
+<span class="co">#&gt; 11  B 2014-07-11</span>
+<span class="co">#&gt; 12  B 2014-07-21</span>
+<span class="co">#&gt; 13  C 2013-07-01</span>
+<span class="co">#&gt; 14  C 2013-07-11</span>
+<span class="co">#&gt; 15  C 2013-07-21</span>
+<span class="co">#&gt; 16  C 2014-07-01</span>
+<span class="co">#&gt; 17  C 2014-07-11</span>
+<span class="co">#&gt; 18  C 2014-07-21</span></code></pre></div>
+<p>Using the <code>match_intervals</code> function we can match the number of intervals in <code>july</code> to those in <code>jan</code>. The <code>attribute_name</code> is the name of the attribute that was added. We then include the two list that we want to match. The <code>id_col</code> and the <code>interval_col</code> are the two columns created for the added attribute.</p>
+<div class="sourceCode" id="cb7"><pre class="downlit sourceCode r">
+<code class="sourceCode R">
+<span class="va">match_list</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/match_intervals.html">match_intervals</a></span><span class="op">(</span>attribute_name <span class="op">=</span> <span class="st">"match"</span>, list1 <span class="op">=</span> <span class="va">july</span>, list2 <span class="op">=</span> <span class="va">jan</span>, id_col <span class="op">=</span> <span class="st">"id"</span>, 
+                       interval_col <span class="op">=</span> <span class="st">"interval_"</span><span class="op">)</span></code></pre></div>
+<p>The output for <code>match_ouput</code> will be a list that contains two new lists. These two new list are the matching lists for the two specified in the arguments. These can be re-assigne to allow for readability or it can be used as is.</p>
+<div class="sourceCode" id="cb8"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span class="va">july</span> <span class="op">&lt;-</span> <span class="va">match_list</span><span class="op">[[</span><span class="fl">1</span><span class="op">]</span><span class="op">]</span>
+<span class="va">jan</span> <span class="op">&lt;-</span> <span class="va">match_list</span><span class="op">[[</span><span class="fl">2</span><span class="op">]</span><span class="op">]</span></code></pre></div>
 </div>
 </div>
   </main><aside class="col-md-3"><nav id="toc"><h2>On this page</h2>

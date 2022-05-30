@@ -28,10 +28,16 @@
     <loc>https://jhnhng.github.io/EMigD/news/index.html</loc>
   </url>
   <url>
+    <loc>https://jhnhng.github.io/EMigD/reference/EMigD.html</loc>
+  </url>
+  <url>
     <loc>https://jhnhng.github.io/EMigD/reference/EmigD_format.html</loc>
   </url>
   <url>
     <loc>https://jhnhng.github.io/EMigD/reference/between_emd.html</loc>
+  </url>
+  <url>
+    <loc>https://jhnhng.github.io/EMigD/reference/check.html</loc>
   </url>
   <url>
     <loc>https://jhnhng.github.io/EMigD/reference/deer.html</loc>
@@ -53,9 +59,6 @@
   </url>
   <url>
     <loc>https://jhnhng.github.io/EMigD/reference/match_intervals.html</loc>
-  </url>
-  <url>
-    <loc>https://jhnhng.github.io/EMigD/reference/trekR.html</loc>
   </url>
   <url>
     <loc>https://jhnhng.github.io/EMigD/reference/within_emd.html</loc>

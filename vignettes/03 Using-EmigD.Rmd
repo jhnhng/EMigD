@@ -25,7 +25,7 @@ The earth mover's distance (EMD), also known as the Wasserstein metric, is a mea
 
 ## EMDs
 
-Calculates the EMD's between the summer and winter UDs. In our example, `seasons[[1]]` and `seasons[[2]]` are used to calculate the EMDs in geographical space, while `sum_rst` and `win_rst` are used to calculate the EMDs in environmental space.
+Calculates the EMD's between the summer and winter UDs. In our example, `sum_raster` and `win_raster` are used to calculate the EMDs in geographical space, while `sum_rst` and `win_rst` are used to calculate the EMDs in environmental space.
 
     # Geographical Space
     btwemd_geo <- between_emd(sum_raster, win_raster)
@@ -43,6 +43,7 @@ Calculates the EMDs between the intervals within a single season.
     withsum_env <- within_emd(sum_rst)
     withwin_env <- within_emd(win_rst)
 
+
 ## EM-Speeds
 
 Calculate 'EM-speeds' by dividing each EMD by the time elapsed between the two UDs it corresponds to. For example, to calculate the EM-speeds between the first intervals in `jan` and `july`, the EMDs for the intervals are divided by the the difference in Julian dates between the starts dates of each interval.
@@ -55,6 +56,7 @@ We calculated the EM-speeds between seasons (e.g., first intervals between `jan`
 
     wesp_sum <- emspeeds(july, july, withsum_geo)
     wesp_win <- emspeeds(jan, jan, withwin_geo)
+
 
 ## Average Within and Between Season EM-Speeds
 

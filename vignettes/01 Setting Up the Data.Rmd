@@ -28,7 +28,16 @@ The example shown below is one of many ways the data could be processed. The imp
 
 For example, for a single individual if I wanted to break a one month period into 10-day intervals I would get a total of three 10-day intervals. These intervals should be in a `list` object, and each element within the `list` should represent a single interval.
 
-The selected periods to be divided into intervals should be chosen so that they fall between migratory trips and don't overlap them. For example if individuals typically begin their migratory trip in spring and fall, the selected periods should not overlap spring and fall, and should be during the winter and summer seasons.
+The selected periods to be divided into intervals should be chosen so that they fall between migratory trips and don't overlap them. For example if individuals typically begins their migratory trip in spring and fall, the selected periods should not overlap spring and fall, and should be during the winter and summer seasons.
+
+### Formatting the Data
+Before moving into the data, we could first format the data so that we can go through the workflow smoothly using `EmigD_format`. This allows us to have a consistent column names as we move through the workflow. The arguments in `EmigD_format` consist of the necessary columns needed.  
+
+```{r}
+deer <- EmigD_format(df, id_ = "AnimalID", dt_ = "dt", x_ = "utm_x", y = "utm_y",
+                   year_ = "year", month_ = "month", jdate_ = "jDate")
+```
+
 
 ### Create Intervals
 
@@ -45,10 +54,9 @@ jan <- deer %>%
   # For any months that has 31 days, the 31st day would normally be assigned its 
   # own interval. The code below takes the 31st day and joins it with the 
   # previous interval. 
-  group_by(ID) %>% 
   mutate(start = if_else(day(start) == 31, start - days(10), start)) %>% 
-  group_by(start, .add = TRUE) %>%
-  filter(month == "1") %>% 
+  group_by(id_, start) %>% 
+  filter(month_ == "1") %>% 
   group_split()
 ```
 
@@ -63,10 +71,9 @@ july <- deer %>%
   # For any months that has 31 days, the 31st day would normally be assigned its 
   # own interval. The code below takes the 31st day and joins it with the 
   # previous interval. 
-  group_by(ID) %>% 
   mutate(start = if_else(day(start) == 31, start - days(10), start)) %>% 
-  group_by(start, .add = TRUE) %>%
-  filter(month == "7") %>% 
+  group_by(id_, start) %>% 
+  filter(month_ == "7") %>% 
   group_split()
 
 ```
@@ -77,26 +84,38 @@ Elements in the list for one individual in January:
 head(jan[1:3])
 ```
 
+We then attach names for each list element in `jan` and `july`. In this case, we include the `id_` and the `year_` for each element. This step is important and it plays an important role when using functions from the `EmigD` package.  
+
+```{r}
+names(jan) <- sapply(jan, function(x) paste(x$id_[1],
+                                            x$year_[1], sep = '_'))
+
+names(july) <- sapply(july, function(x) paste(x$id_[1],
+                                              x$year_[1], sep = '_'))
+```
+
+
 ## Create Tracks for Each Interval
 
-Before we estimate LoCoH home range for each of these 10-day intervals, we first create objects of class `track_xyt` using `make_track()` from the `amt` package. This function creates a `track` using the `utm_x` and `utm_y` columns from `jan` and `july`. `lapply()` allows us to apply the specified function across a `list` object (e.g., `jan` and `july`)
+Before we estimate LoCoH home range for each of these 10-day intervals, we first create objects of class `track_xyt` using `make_track()` from the `amt` package. This function creates a `track` using the `x_` and `y_` columns from `jan` and `july`. `lapply()` allows us to apply the specified function across a `list` object (e.g., `jan` and `july`)
 
 ```{r tracks, message = FALSE}
 track_list_sum <- lapply(july, function(x) {
-  amt::make_track(tbl = x, .x = utm_x, .y = utm_y, .t = date,
+  amt::make_track(tbl = x, .x = x_, .y = y_, .t = date,
              uid = ID,
              # lat/long: 4326 (lat/long, WGS84 datum).
              # utm: crs = sp::CRS("+init=epsg:32612"))
              crs = 32612)
 })
 track_list_win <- lapply(jan, function(x) {
-  amt::make_track(tbl = x, .x = utm_x, .y = utm_y, .t = date,
+  amt::make_track(tbl = x, .x = x_, .y = y_, .t = date,
              uid = ID,
              crs = 32612)
 })
 
 
 ```
+
 
 ## Creates LoCoHs Using the Tracks
 
@@ -153,6 +172,7 @@ win_iso <- lapply(win_locoh, function(x){
 
 ```
 
+
 ## Rasterizes the Isopleths
 
 After creating isopleths for each of the intervals, we have to rasterize them. Similar to the the previous functions, we use `lapply()` to apply our function across our `list` object. We first select the resolution for that we want for our rasters (`res`). We then create a template raster with a resolution of `res` (keep in mind that the speed the isopleths are `rasterize()` will be dependent on the specified resolution, with time of processing increasing with smaller resolutions). The projection of the template raster will match that of the specified isopleth.
@@ -204,10 +224,10 @@ win_raster <- lapply(win_iso, function(iso){
 })
 
 names(win_raster) <- sapply(jan, function(x) paste(x$ID[1],
-                                            x$year[1], sep = '_'))
+                                            x$year_[1], sep = '_'))
 
 names(sum_raster) <- sapply(july, function(x) paste(x$ID[1],
-                                              x$year[1], sep = '_'))
+                                              x$year_[1], sep = '_'))
 
 ```
 
@@ -219,7 +239,7 @@ We attach attributes to our list of rasters to allow for more flexibility in wor
 # Add an attribute to hold the attributes of each list element
 attributes(win_raster) <- data.frame(id = sapply(jan, function(x) paste(x$ID[1])),
                                       interval_start_date = sapply(jan, function(x) paste(x$start[1])),
-                                      year = paste0(sapply(jan, function(x) paste(x$year[1])))
+                                      year = paste0(sapply(jan, function(x) paste(x$year_[1])))
 )
 
 # Check the attributes
@@ -228,7 +248,7 @@ attributes(win_raster)
 # Add an attribute "tab" to hold the attributes of each list element
 attributes(sum_raster) <- data.frame(id = sapply(july, function(x) paste(x$ID[1])),
                                       interval_start_date = sapply(july, function(x) paste(x$start[1])),
-                                      year = paste0(sapply(july, function(x) paste(x$year[1])))
+                                      year = paste0(sapply(july, function(x) paste(x$year_[1])))
 )
 
 # Check the attributes
@@ -275,7 +295,7 @@ basename(list_names)
 
 ```
 
-We then read in those files into R as `RasterLayer` objects. For each of those `list` elements in `env_lists` we assign the path names for each of those files. Using the assigned names, we created attributes(metadata) for our list with a `year` column. The `year` column may change depending on the temporal scale of your environmental covariate. For example, if we had environmental covariates that changed daily, we can first aggregate the daily covariates based the intervals. Instead of using `year`, we would then use the start date of the intervals.
+We then read in those files into R as `RasterLayer` objects. For each of those `list` elements in `env_lists` we assign the path names for each of those files. Using the assigned names, we created `attributes` for our list with a `year` column. The `year` column may change depending on the temporal scale of your environmental covariate. For example, if we had environmental covariates that changed daily, we can first aggregate the daily covariates based on the intervals. Instead of using `year`, we would then use the start date of the intervals.
 
 ```{r}
 # Rasterize the environmental covariates
@@ -293,7 +313,7 @@ attributes(env_list)
 
 We use `env_raster_stack` with the addition of the `attribute` argument to stack environmental covariate layers with our home range rasters. The input for the `attribute` argument should be a attribute component that is the same in both of the `list` objects (i.e., env_list and sum_raster/win_raster) with the same unique values. For example, both `env_list` and `sum_raster`/`win_raster` have a attribute component labelled `year` and both have the same unique values (e.g., 2013 and 2014).
 
-NOTE: Currently this feature assumes that only environmental layers relevant to `sum_raster` or `win_raster` are being used and are in the same folder(i.e., excluding any that are not present in `sum_raster` and/or `win_raster`.)
+NOTE: Currently this feature assumes that only environmental layers relevant to `sum_raster` or `win_raster` are being used and are in the same folder(i.e., excluding any `year` that are not present in `sum_raster` and/or `win_raster`.)
 
 ```{r}
 sum_rst_temporal <- env_raster_stack(env_list, sum_raster, attribute = "year")

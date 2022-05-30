@@ -39,14 +39,15 @@ jan <- deer %>%
   # For any months that has 31 days, the 31st day would normally be assigned its 
   # own interval. The code below takes the 31st day and joins it with the 
   # previous interval. 
-  group_by(ID) %>% 
   mutate(start = if_else(day(start) == 31, start - days(10), start)) %>% 
-  group_by(start, .add = TRUE) %>%
+  group_by(id_, start) %>%
   filter(month == "1") %>% 
   group_split()
 ```
+
 Let's remove some list elements from the `jan` interval so that we have 
-different number of intervals between `jan` and `july`. 
+different number of intervals between `jan` and `july`.
+
 ```{r}
 jan <- jan[-c(17,18)]
 ```
@@ -62,34 +63,51 @@ july <- deer %>%
   # For any months that has 31 days, the 31st day would normally be assigned its 
   # own interval. The code below takes the 31st day and joins it with the 
   # previous interval. 
-  group_by(ID) %>% 
   mutate(start = if_else(day(start) == 31, start - days(10), start)) %>% 
-  group_by(start, .add = TRUE) %>%
+  group_by(id_, start) %>%
   filter(month == "7") %>% 
   group_split()
 
 ```
 
-### Assign names to the list elements
-The names that are assigned to each list element is specific to that interval.
-In this case, we use the `ID` and `start` columns in the list element to assign 
-a name. These names are important because they are later used to determine which 
-elements are missing between the two list objects.
-
-```{r Names for intervals}
-names(jan) <- sapply(jan, function(x) paste(x$ID[1],
-                                            x$start[1], sep = '_'))
-
-names(july) <- sapply(july, function(x) paste(x$ID[1],
-                                              x$start[1],sep = '_'))
-                                              
-```
-
 ### Matching Intervals
+
+Before we can begin matching the intervals, we first assign attributes to the two list (`jan` and `july`). We name this attribute `match`, and within this attribute table, we have two columns (`id` and `interval_`). We can use `check` to conveniently look our attribute table. 
+```{r}
+# Add an attribute to hold the attributes of each list element
+attr(jan, "match") <- data.frame(id = sapply(jan, function(x) paste(x$id_[1])),
+                                  interval_ = sapply(jan, function(x) paste(x$start[1]))
+)
+
+# Check the attributes
+check(jan, "match")
+
+# Add an attribute "tab" to hold the attributes of each list element
+attr(july, "match") <- data.frame(id = sapply(july, function(x) paste(x$id_[1])),
+                                  interval_ = sapply(july, function(x) paste(x$start[1]))
+) 
+
+# Check the attributes
+check(july, "match")
+```
+
+
 Using the `match_intervals` function we can match the number of intervals in 
-`july` to those in `jan`. In this case, the first argument `list1` is the 
-reference list for the second argument `list2`. 
+`july` to those in `jan`. The `attribute_name` is the name of the attribute that was added. We then include the two list that we want to match. The `id_col` and the `interval_col` are the two columns created for the added attribute. 
+
 ```{r Matching Intervals}
-july <- match_intervals(list1 = jan, list2 = july)
+
+match_list <- match_intervals(attribute_name = "match", list1 = july, list2 = jan, id_col = "id", 
+                       interval_col = "interval_")
 
 ```
+
+The output for `match_ouput` will be a list that contains two new lists. These two new list are the matching lists for the two specified in the arguments. These can be re-assigne to allow for readability or it can be used as is. 
+
+```{r}
+july <- match_list[[1]]
+jan <- match_list[[2]]
+```
+
+
+

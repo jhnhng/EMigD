@@ -34,7 +34,6 @@ EmigD_format <- function(dat, id_, dt_, x_, y_, year_, month_, jdate_){
                           "y_",
                           "year_",
                           "month_",
-                          "jdate_",
-                          "class_")
+                          "jdate_")
   return(EMigD_cols)
 }

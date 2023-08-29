@@ -18,7 +18,7 @@
 #'
 
 #' @export
-EmigD_format <- function(dat, id_, dt_, x_, y_, year_, month_, jdate_, class_){
+EmigD_format <- function(dat, id_, dt_, x_, y_, year_, month_, jdate_, class_ = NULL){
   EMigD_cols <- subset(dat,
                        select=c(id_,
                                 dt_,

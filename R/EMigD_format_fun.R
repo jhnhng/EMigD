@@ -18,22 +18,28 @@
 #'
 
 #' @export
-EmigD_format <- function(dat, id_, dt_, x_, y_, year_, month_, jdate_){
-  EMigD_cols <- subset(dat,
-                       select=c(id_,
-                                dt_,
-                                x_,
-                                y_,
-                                year_,
-                                month_,
-                                jdate_))
-
-  names(EMigD_cols) <- c("id_",
-                         "dt_",
-                          "x_",
-                          "y_",
-                          "year_",
-                          "month_",
-                          "jdate_")
+EmigD_format <- function(dat, id_, dt_, x_, y_, year_, month_, jdate_, class_ = NULL){
+  # Columns to select
+  select_cols <- c(id_, dt_, x_, y_, year_, month_, jdate_)
+  
+  # If class_ is provided, append it to the list of columns to select
+  if(!is.null(class_)){
+    select_cols <- c(select_cols, class_)
+  }
+  
+  # Extract the specified columns
+  EMigD_cols <- subset(dat, select=c(select_cols))
+  
+  # Rename the columns
+  colnames_base <- c("id_", "dt_", "x_", "y_", "year_", "month_", "jdate_")
+  
+  # If class_ is provided, append its name to the renamed columns list
+  if(!is.null(class_)){
+    colnames_base <- c(colnames_base, "class_")
+  }
+  
+  names(EMigD_cols) <- colnames_base
+  
   return(EMigD_cols)
 }
+
